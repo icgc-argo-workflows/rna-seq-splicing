@@ -1,7 +1,6 @@
 # Package alternative-splicing-spladder
 
-
-Please update this with a brief introduction of the package.
+This package contains the wrapper for using the alternative splicing analysis tool [SplAdder](https://github.com/ratschlab/spladder).
 
 
 ## Package development
@@ -13,12 +12,18 @@ versioning, updating, CI testing and releasing.
 
 ## Inputs
 
-Please list all input parameters
+This package takes the following inputs:
+```
+    TBA
+```
 
 
 ## Outputs
 
-Please list all outputs
+This package generates the following outputs:
+```
+    TBA
+```
 
 
 ## Usage

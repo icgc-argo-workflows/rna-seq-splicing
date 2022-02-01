@@ -1,7 +1,33 @@
 {
-    "input_file": "input/test_rg_3.bam",
-    "expected_output": "expected/expected.test_rg_3.bam",
+    "alignment": "input/testcase_events_1_sample1.bam",
+    "alignment_index": "input/testcase_events_1_sample1.bam.bai",
+    "annotation": "input/testcase_events.gtf",
+    "genome": "input/genome.fa",
     "publish_dir": "outdir",
     "cpus": 1,
-    "mem": 0.5
+    "mem": 0.5,
+    "expected_gff": [
+        "expected/exp_merge_graphs_alt_3prime_C3.confirmed.gff3",
+        "expected/exp_merge_graphs_alt_5prime_C3.confirmed.gff3",
+        "expected/exp_merge_graphs_exon_skip_C3.confirmed.gff3",
+        "expected/exp_merge_graphs_intron_retention_C3.confirmed.gff3",
+        "expected/exp_merge_graphs_mult_exon_skip_C3.confirmed.gff3",
+        "expected/exp_merge_graphs_mutex_exons_C3.confirmed.gff3"
+    ],
+    "expected_txt": [
+        "expected/exp_merge_graphs_alt_3prime_C3.confirmed.txt.gz",
+        "expected/exp_merge_graphs_alt_5prime_C3.confirmed.txt.gz",
+        "expected/exp_merge_graphs_exon_skip_C3.confirmed.txt.gz",
+        "expected/exp_merge_graphs_intron_retention_C3.confirmed.txt.gz",
+        "expected/exp_merge_graphs_mult_exon_skip_C3.confirmed.txt.gz",
+        "expected/exp_merge_graphs_mutex_exons_C3.confirmed.txt.gz"
+    ],
+    "expected_hdf5": [
+        "expected/exp_merge_graphs_alt_3prime_C3.counts.hdf5",
+        "expected/exp_merge_graphs_alt_5prime_C3.counts.hdf5",
+        "expected/exp_merge_graphs_exon_skip_C3.counts.hdf5",
+        "expected/exp_merge_graphs_intron_retention_C3.counts.hdf5",
+        "expected/exp_merge_graphs_mult_exon_skip_C3.counts.hdf5",
+        "expected/exp_merge_graphs_mutex_exons_C3.counts.hdf5"
+    ]
 }

@@ -48,60 +48,123 @@ params.container_version = ""
 params.container = ""
 
 // tool specific parmas go here, add / change as needed
-params.input_file = ""
-params.expected_output = ""
+params.alignment = ""
+params.alignment_index = ""
+params.annotation = ""
+params.genome = ""
+params.expected_gff = ""
+params.expected_hdf5 = ""
+params.expected_txt = ""
 
 include { alternativeSplicingSpladder } from '../main'
 
-
-process file_smart_diff {
+process gff_diff {
   container "${params.container ?: container[params.container_registry ?: default_container_registry]}:${params.container_version ?: version}"
 
   input:
-    path output_file
-    path expected_file
+    path output_files
+    path expected_files
 
   output:
     stdout()
 
   script:
     """
-    # Note: this is only for demo purpose, please write your own 'diff' according to your own needs.
-    # in this example, we need to remove date field before comparison eg, <div id="header_filename">Tue 19 Jan 2021<br/>test_rg_3.bam</div>
-    # sed -e 's#"header_filename">.*<br/>test_rg_3.bam#"header_filename"><br/>test_rg_3.bam</div>#'
+    for event_type in exon_skip alt_3prime alt_5prime intron_retention mult_exon_skip mutex_exons
+    do
+        out=\$(echo ${output_files} | tr ' ' '\n' | grep \${event_type})
+        exp=\$(echo ${expected_files} | tr ' ' '\n' | grep \${event_type})
+        diff \${out} \${exp} && (echo "Test PASSED") || ( echo "Test FAILED, gff files mismatch." && exit 1 )
+    done && exit 0
+    """
+}
 
-    cat ${output_file[0]} \
-      | sed -e 's#"header_filename">.*<br/>#"header_filename"><br/>#' > normalized_output
+process gzip_diff {
+  container "${params.container ?: container[params.container_registry ?: default_container_registry]}:${params.container_version ?: version}"
 
-    ([[ '${expected_file}' == *.gz ]] && gunzip -c ${expected_file} || cat ${expected_file}) \
-      | sed -e 's#"header_filename">.*<br/>#"header_filename"><br/>#' > normalized_expected
+  input:
+    path output_files
+    path expected_files
 
-    diff normalized_output normalized_expected \
-      && ( echo "Test PASSED" && exit 0 ) || ( echo "Test FAILED, output file mismatch." && exit 1 )
+  output:
+    stdout()
+
+  script:
+    """
+    for event_type in exon_skip alt_3prime alt_5prime intron_retention mult_exon_skip mutex_exons
+    do
+        out=\$(echo ${output_files} | tr ' ' '\n' | grep \${event_type})
+        exp=\$(echo ${expected_files} | tr ' ' '\n' | grep \${event_type})
+        diff <(zcat \${out}) <(zcat \${exp}) && (echo "Test PASSED") || ( echo "Test FAILED, files mismatch." && exit 1 )
+    done && exit 0
+    """
+}
+
+process hdf5_diff {
+  container "${params.container ?: container[params.container_registry ?: default_container_registry]}:${params.container_version ?: version}"
+
+  input:
+    path output_files
+    path expected_files
+
+  output:
+    stdout()
+
+  script:
+    """
+    for event_type in exon_skip alt_3prime alt_5prime intron_retention mult_exon_skip mutex_exons
+    do
+        out=\$(echo ${output_files} | tr ' ' '\n' | grep \${event_type})
+        exp=\$(echo ${expected_files} | tr ' ' '\n' | grep \${event_type})
+        diff <(h5ls -r \${out} | sort) <(h5ls -r \${exp} | sort) && (echo "Test PASSED") || ( echo "Test FAILED, files mismatch." && exit 1 )
+    done && exit 0
     """
 }
 
 
 workflow checker {
   take:
-    input_file
-    expected_output
+    alignment
+    alignment_index
+    annotation
+    genome
+    expected_gff
+    expected_txt
+    expected_hdf5
 
   main:
     alternativeSplicingSpladder(
-      input_file
+      alignment,
+      alignment_index,
+      annotation,
+      genome
     )
 
-    file_smart_diff(
-      alternativeSplicingSpladder.out.output_file,
-      expected_output
+    gff_diff(
+      alternativeSplicingSpladder.out.gff,
+      expected_gff
+    )
+
+    hdf5_diff(
+      alternativeSplicingSpladder.out.counts,
+      expected_hdf5
+    )
+
+    gzip_diff(
+      alternativeSplicingSpladder.out.txt,
+      expected_txt
     )
 }
 
 
 workflow {
   checker(
-    file(params.input_file),
-    file(params.expected_output)
+    file(params.alignment),
+    file(params.alignment_index),
+    file(params.annotation),
+    file(params.genome),
+    params.expected_gff.collect({it -> file(it)}),
+    params.expected_txt.collect({it -> file(it)}),
+    params.expected_hdf5.collect({it -> file(it)})
   )
 }

@@ -49,8 +49,13 @@ params.publish_dir = ""  // set to empty string will disable publishDir
 
 
 // tool specific parmas go here, add / change as needed
-params.input_file = ""
-params.output_pattern = "*"  // output file name pattern
+params.alignment = ""
+params.alignment_index = ""
+params.annotation = ""
+params.genome = ""
+params.output_pattern_gff = "*.gff3"
+params.output_pattern_hdf5 = "*.hdf5"
+params.output_pattern_txt = "*.txt.gz"
 
 
 process alternativeSplicingSpladder {
@@ -61,21 +66,21 @@ process alternativeSplicingSpladder {
   memory "${params.mem} GB"
 
   input:  // input, make update as needed
-    path input_file
+    path alignment
+    path alinment_index
+    path annotation
+    path genome
 
   output:  // output, make update as needed
-    path "output_dir/${params.output_pattern}", emit: output_file
+    path "output_dir/${params.output_pattern_gff}", emit: gff
+    path "output_dir/${params.output_pattern_hdf5}", emit: counts
+    path "output_dir/${params.output_pattern_txt}", emit: txt
 
   script:
-    // add and initialize variables here as needed
-
     """
     mkdir -p output_dir
 
-    main.py \
-      -i ${input_file} \
-      -o output_dir
-
+    spladder build --outdir output_dir  --bams ${alignment} --annotation ${annotation} --readlen 50 --sparse-bam --parallel ${params.cpus} --reference ${genome} --use-anno-support --filter-consensus lenient > spladder.log 2>&1
     """
 }
 
@@ -84,6 +89,9 @@ process alternativeSplicingSpladder {
 // using this command: nextflow run <git_acc>/<repo>/<pkg_name>/<main_script>.nf -r <pkg_name>.v<pkg_version> --params-file xxx
 workflow {
   alternativeSplicingSpladder(
-    file(params.input_file)
+    file(params.alignment),
+    file(params.alignment_index),
+    file(params.annotation),
+    file(params.genome)
   )
 }
