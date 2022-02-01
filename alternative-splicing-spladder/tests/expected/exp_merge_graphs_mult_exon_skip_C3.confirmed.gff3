@@ -1,0 +1,10 @@
+##gff-version 3
+1	mult_exon_skip	gene	3101	4000	.	+	.	ID=mult_exon_skip.1;GeneName="gene5";HasNovelJunction="N"
+1	mult_exon_skip	mRNA	3101	4000	.	+	.	ID=mult_exon_skip.1_iso1;Parent=mult_exon_skip.1;GeneName="gene5";HasNovelJunction="N"
+1	mult_exon_skip	exon	3101	3200	.	+	.	Parent=mult_exon_skip.1_iso1
+1	mult_exon_skip	exon	3901	4000	.	+	.	Parent=mult_exon_skip.1_iso1
+1	mult_exon_skip	mRNA	3101	4000	.	+	.	ID=mult_exon_skip.1_iso2;Parent=mult_exon_skip.1;GeneName="gene5";HasNovelJunction="N"
+1	mult_exon_skip	exon	3101	3200	.	+	.	Parent=mult_exon_skip.1_iso2
+1	mult_exon_skip	exon	3351	3450	.	+	.	Parent=mult_exon_skip.1_iso2
+1	mult_exon_skip	exon	3651	3750	.	+	.	Parent=mult_exon_skip.1_iso2
+1	mult_exon_skip	exon	3901	4000	.	+	.	Parent=mult_exon_skip.1_iso2
